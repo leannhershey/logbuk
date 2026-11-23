@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LogBUk – Bicol University Dormitory Log Book</title>
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div class="public-page">
+    <header class="topbar">
+      <a class="brand">
+        <img src="assets/images/logo_header.png" alt="LogBUk logo header">
+      </a>
+      <span class="role-pill hidden" id="pill-occupant"><span data-icon="user"></span>Occupant</span>
+      <span class="role-pill hidden" id="pill-admin"><span data-icon="admin"></span>Admin</span>
+    </header>
+
+    <main class="public-main">
+      <!-- role selection -->
+      <div class="view" id="view-role">
+        <section class="card role-card">
+        <img class="role-card__logo" src="assets/images/logo.png" alt="LogBUk logo">
+        <p class="role-card__subtitle">Bicol University Dormitory Digitalized Log Book System</p>
+
+        <div class="role-options">
+          <article class="role-option role-option--admin">
+            <span data-icon="admin"></span>
+            <h2>Admin</h2>
+            <p>For Dormitory Management<br>Manage occupant registration, room assignments, records, and reports.</p>
+            <a class="role-option__btn" href="#admin">Continue as Admin</a>
+          </article>
+
+          <article class="role-option role-option--occupant">
+            <span data-icon="user"></span>
+            <h2>Occupant</h2>
+            <p>For Registered Occupants<br>Record your dormitory time-in and time-out.</p>
+            <a class="role-option__btn" href="#occupant">Continue as Occupant</a>
+          </article>
+        </div>
+      </section>
+      </div>
+
+      <!-- occupant ID entry -->
+      <div class="view" id="view-occupant">
+        <section class="card auth-card">
+        <div class="auth-card__icon_occupant"><span data-icon="clipboard"></span></div>
+        <h1>Occupant E-Logbook</h1>
+
+        <!-- occupant ID entry -->
+        <div>
+          <p class="auth-card__hint">Enter your registered occupant ID to proceed.</p>
+          <form id="idForm" novalidate>
+            <div class="field" id="idField">
+              <label for="occupantId">Occupant ID</label>
+              <input type="text" id="occupantId" placeholder="e.g. 01-0001" autocomplete="off">
+              <p class="field__error" role="alert"><span data-icon="warning"></span><span></span></p>
+            </div>
+            <button type="submit" class="btn btn--primary">Verify ID</button>
+          </form>
+          <a class="link-home" href="#role"><span data-icon="homeSolid"></span>Return to Home</a>
+        </div>
+</section>
+      </div>
+
+      <!-- admin verification -->
+      <div class="view" id="view-admin">
+        <section class="card auth-card">
+        <div class="auth-card__icon_admin"><span data-icon="key"></span></div>
+        <h1>Admin Verification</h1>
+        <p class="auth-card__hint">Enter the administrator passcode to continue.</p>
+
+        <form id="verifyForm" novalidate>
+          <div class="field" id="passcodeField">
+            <label class="sr-only" for="passcode">Administrator passcode</label>
+            <input type="password" id="passcode" placeholder="Enter passcode" autocomplete="current-password">
+            <p class="field__error" role="alert"><span data-icon="warning"></span><span></span></p>
+          </div>
+          <button type="submit" class="btn btn--primary">Verify Passcode</button>
+        </form>
+
+        <a class="link-home" href="#role"><span data-icon="homeSolid"></span>Return to Home</a>
+      </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/index.js"></script>
+</body>
+</html>
