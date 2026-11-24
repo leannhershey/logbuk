@@ -133,12 +133,12 @@ if ($pdo) {
         $routines = $pdo->query("SELECT ROUTINE_NAME FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = DATABASE()")->fetchAll(PDO::FETCH_COLUMN);
         add($checks, 'Stored procedures installed', count($routines) >= 2,
             $routines ? implode(', ', $routines) : 'none',
-            'Import db/logbuk.sql.');
+            'Import db/logbuk.sql, or run db/sql-ver-004.sql if you are on the incremental path.');
 
         $triggers = $pdo->query("SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE()")->fetchAll(PDO::FETCH_COLUMN);
         add($checks, 'Triggers installed', count($triggers) >= 2,
             $triggers ? implode(', ', $triggers) : 'none',
-            'Import db/logbuk.sql.');
+            'Import db/logbuk.sql, or run db/sql-ver-004.sql.');
 
         $admins = (int) $pdo->query('SELECT COUNT(*) FROM `Admins`')->fetchColumn();
         add($checks, 'An admin passcode is stored', $admins > 0, $admins . ' row(s)',

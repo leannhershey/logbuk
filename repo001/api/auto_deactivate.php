@@ -1,4 +1,14 @@
 <?php
+/**
+ * Runs the inactivity rule on demand.
+ *
+ *   GET  api/auto_deactivate.php            -> runs only if it is due (24h)
+ *   GET  api/auto_deactivate.php?force=1    -> runs regardless (admin)
+ *   GET  api/auto_deactivate.php?run=1      -> alias of force
+ *
+ * Point a cron job at ?force=1 once a day if your host allows it:
+ *   0 2 * * *  curl -s "http://localhost/logbuk/api/auto_deactivate.php?force=1"
+ */
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/occupants.php';
 require_once __DIR__ . '/../includes/auto-deactivate.php';

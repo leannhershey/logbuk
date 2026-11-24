@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Admin -> Occupants -> Register Occupant
+ * Server side: validates + saves (works without JavaScript).
+ * JavaScript (assets/js/occupant-form.js) adds the live room panel and
+ * inline validation, but the POST below is the source of truth.
+ */
 require_once __DIR__ . '/../includes/auth.php';
 require_admin_page();          // no session -> back to index.html#admin
 
@@ -69,7 +74,9 @@ $pageSub   = 'Admin Occupants › Register Occupant';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/app.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/occupants.css">
 </head>
 <body>
   <div class="admin-shell">
@@ -105,7 +112,9 @@ $pageSub   = 'Admin Occupants › Register Occupant';
     </div>
   </div>
 
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/tooltips.js"></script>
   <script src="../assets/js/occupants.js"></script>
+  <script src="../assets/js/occupant-form.js"></script>
 </body>
 </html>

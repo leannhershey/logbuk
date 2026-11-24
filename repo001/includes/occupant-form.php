@@ -151,11 +151,11 @@ foreach ($rooms as $r) {
 
       <div class="occupant-form__actions">
         <button type="submit" class="btn btn--primary" id="saveBtn"
-                data-tooltip="<?= $mode === '' ? '' : '' ?>">
+                data-tooltip="<?= $mode === 'create' ? 'Save and generate the occupant ID' : 'Save changes to this occupant' ?>">
           <?= $mode === 'create' ? 'Save Occupant' : 'Save Changes' ?>
         </button>
         <a class="btn btn--outline" href="occupants.php"
-           data-tooltip="">Cancel</a>
+           data-tooltip="Back to the occupants list without saving">Cancel</a>
       </div>
     </section>
 

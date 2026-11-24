@@ -1,4 +1,8 @@
 <?php
+/**
+ * Session bootstrap + guards + JSON body helpers.
+ * Shared by every endpoint under /api.
+ */
 
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([

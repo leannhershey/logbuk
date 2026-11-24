@@ -3,7 +3,7 @@
  * Data access + validation for the Occupants modules.
  *
  * Used by:
- *   occupants.php           -> list / sort / filter / search
+ *   occupants.html          -> list / sort / filter / search
  *   register-occupant.php   -> add form
  *   edit-occupant.php       -> edit form
  *   api/occupants_api.php   -> modal actions (deactivate / reactivate) + validation
@@ -11,7 +11,7 @@
  * Keeping it in one place means the list, the forms and the API can never
  * disagree about what a valid occupant looks like.
  *
- * Requires db/logbuk.sql.
+ * Requires sql-ver-002.sql + sql-ver-003.sql.
  */
 
 require_once __DIR__ . '/db.php';
@@ -113,7 +113,7 @@ function occupants_count(array $filters): int
     return (int) $stmt->fetchColumn();
 }
 
-/** Overall occupant counts (ignores the filters). Used by api/occupants_api.php?action=stats. */
+/** Counts for the summary chips above the table (ignores the filters). */
 function occupants_stats(): array
 {
     $row = db()->query("

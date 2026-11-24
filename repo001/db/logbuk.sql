@@ -507,3 +507,5 @@ SELECT `occupants_id`, `residency`, IFNULL(`Rooms_room_id`, '—') AS `room`,
        IFNULL(`occupants_deactivate_source`, '—') AS `deactivated_by`
   FROM `vw_occupants_directory`
  ORDER BY `occupants_id`;
+
+-- done

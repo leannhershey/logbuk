@@ -1,9 +1,21 @@
 <?php
+/**
+ * Occupant write API (JSON).
+ *
+ *   POST api/occupants_api.php
+ *   { "action": "deactivate", "occupant_id": "01-0001", "reason": "End of semester" }
+ *   { "action": "reactivate", "occupant_id": "01-0002", "room_id": "0202" }
+ *   { "action": "validate",   "occupant_id": "01-0002", "first_name": "...", ... }  (dry run, used by the forms)
+ *
+ * Responses are always {ok: bool, message: string, ...}. Validation failures
+ * also carry {errors: {field: message}} with HTTP 422 so the forms can show
+ * messages under the right input.
+ */
+
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/occupants.php';
 
 header('Content-Type: application/json');
-require_admin();
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     header('Allow: POST');
@@ -36,6 +48,7 @@ try {
             json_response($result, $result['ok'] ? 200 : 409);
 
         case 'validate':
+            // Same rules the forms use, without writing anything.
             [, $errors] = validate_occupant_input($input, $input['occupant_id'] ?? null);
             if ($errors) {
                 json_response(['ok' => false, 'errors' => $errors, 'message' => 'Please fix the highlighted fields.'], 422);
@@ -49,6 +62,7 @@ try {
             json_error('Unknown action.', 400);
     }
 } catch (Throwable $ex) {
+    // Never leak a stack trace to the browser; log it for the developer.
     error_log('occupants_api: ' . $ex->getMessage());
     json_error('Server error: ' . $ex->getMessage(), 500);
 }

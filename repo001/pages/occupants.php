@@ -1,5 +1,18 @@
 <?php
-
+/**
+ * Admin -> Occupants  (the screen you reach from the sidebar)
+ *
+ * Server-rendered: sorting, filtering, search, counting and pagination are all
+ * done in MySQL. The JS layer (assets/js/occupants.js) only makes it feel
+ * instant and drives the deactivate / reactivate modals through api/occupants_api.php.
+ *
+ *   occupants.php
+ *   occupants.php?q=rene
+ *   occupants.php?room=0101&residency=Active&sort=name&dir=desc&page=2
+ *
+ * `occupants.html` is a one-line redirect to this file so the existing
+ * dashboard.js sidebar link keeps working.
+ */
 require_once __DIR__ . '/../includes/auth.php';
 require_admin_page();          // no session -> back to index.html#admin
 
@@ -26,7 +39,7 @@ $autoRun    = null;
 try {
     // "Outside for 2 weeks" rule: runs at most once a day, then the page
     // renders with whatever the rule decided. Fails silently if the patch
-    // (db/logbuk.sql) has not been imported yet.
+    // (sql-ver-004.sql) has not been applied yet.
     require_once __DIR__ . '/../includes/auto-deactivate.php';
     try {
         $autoRun = auto_deactivate_if_due(24);
@@ -34,6 +47,7 @@ try {
         $autoRun = null;   // procedure missing -> not fatal
     }
 
+    $stats     = occupants_stats();
     $total     = occupants_count($filters);
     $lastPage  = max(1, (int) ceil($total / OCCUPANTS_PER_PAGE));
     $page      = min($page, $lastPage);
@@ -41,12 +55,16 @@ try {
     $rooms     = rooms_with_occupancy();
 } catch (Throwable $ex) {
     $dbError   = $ex->getMessage();
+    $stats     = ['total' => 0, 'active' => 0, 'inactive' => 0, 'inside' => 0];
     $total     = 0;
     $lastPage  = 1;
     $occupants = [];
     $rooms     = [];
 }
 
+/* ---------------- helpers ---------------- */
+
+/** Current query string with overrides — used by sort links, pager and filters. */
 function qs(array $overrides = []): string
 {
     $base = [
@@ -62,27 +80,21 @@ function qs(array $overrides = []): string
     return 'occupants.php' . ($merged ? '?' . http_build_query($merged) : '');
 }
 
+/** Sortable column header: toggles asc/desc, shows an arrow on the active column. */
 function sort_header(string $key, string $label, string $currentSort, string $currentDir): string
 {
     $isActive = $currentSort === $key;
-    $isAsc    = strtoupper($currentDir) === 'ASC';
-
-    if ($isActive && !$isAsc) {
-        $href = qs(['sort' => '', 'dir' => '', 'page' => '']);   // 3rd click: reset
-        $next = '';
-    } else {
-        $next = $isActive ? 'desc' : 'asc';
-        $href = qs(['sort' => $key, 'dir' => $next, 'page' => '']);
-    }
-
+    $nextDir  = $isActive && strtoupper($currentDir) === 'ASC' ? 'desc' : 'asc';
+    $arrow    = $isActive
+        ? (strtoupper($currentDir) === 'ASC' ? '▲' : '▼')
+        : '';
+    $href = qs(['sort' => $key, 'dir' => $nextDir, 'page' => '']);
+    $cls  = 'th-sort' . ($isActive ? ' is-sorted' : '');
     return sprintf(
-        '<a class="th-sort%s" href="%s" aria-sort="%s" data-sort="%s" data-dir="%s">%s<span class="th-sort__arrow">%s</span></a>',
-        $isActive ? ' is-sorted' : '',
-        e($href),
-        $isActive ? ($isAsc ? 'ascending' : 'descending') : 'none',
-        e($next === '' ? '' : $key), e($next),
-        e($label),
-        $isActive ? ($isAsc ? '▲' : '▼') : ''
+        '<a class="%s" href="%s" aria-sort="%s" data-sort="%s" data-dir="%s">%s<span class="th-sort__arrow">%s</span></a>',
+        $cls, e($href),
+        $isActive ? (strtoupper($currentDir) === 'ASC' ? 'ascending' : 'descending') : 'none',
+        e($key), e($nextDir), e($label), $arrow
     );
 }
 
@@ -112,7 +124,9 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/app.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/occupants.css">
 </head>
 <body>
   <div class="admin-shell">
@@ -169,6 +183,30 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
             </div>
           </div>
         <?php else: ?>
+
+        <!-- Summary chips -->
+        <section class="stat-chips" aria-label="Occupancy summary">
+          <a class="chip <?= !$hasFilters ? 'is-active' : '' ?>" href="occupants.php">
+            <span class="chip__value"><?= $stats['total'] ?></span>
+            <span class="chip__label">All occupants</span>
+          </a>
+          <a class="chip" href="<?= e(qs(['residency' => 'Active', 'page' => ''])) ?>"
+             data-tooltip="Occupants with an active room assignment">
+            <span class="chip__value"><?= $stats['active'] ?></span>
+            <span class="chip__label">Active</span>
+          </a>
+          <a class="chip" href="<?= e(qs(['presence' => 'Inside', 'residency' => 'Active', 'page' => ''])) ?>"
+             data-tooltip="Active occupants currently timed in">
+            <span class="chip__value"><?= $stats['inside'] ?></span>
+            <span class="chip__label">On premises</span>
+          </a>
+          <a class="chip <?= ($filters['residency'] === 'Inactive') ? 'is-active' : '' ?>"
+             href="<?= e(qs(['residency' => 'Inactive', 'page' => ''])) ?>"
+             data-tooltip="Deactivated occupants with no room — can be reactivated">
+            <span class="chip__value"><?= $stats['inactive'] ?></span>
+            <span class="chip__label">Inactive</span>
+          </a>
+        </section>
 
         <!-- Toolbar -->
         <form class="list-toolbar" method="get" action="occupants.php" id="filterForm">
@@ -229,7 +267,7 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
             <table class="occupants-table">
               <thead>
                 <tr>
-                  <th>Occupant ID</th>
+                  <th><?= sort_header('id',    'Occupant ID', $sort, $dir) ?></th>
                   <th><?= sort_header('name',  'Full Name',   $sort, $dir) ?></th>
                   <th><?= sort_header('program', 'Program',   $sort, $dir) ?></th>
                   <th><?= sort_header('contact', 'Contact Number', $sort, $dir) ?></th>
@@ -243,7 +281,7 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
               <tbody>
                 <?php if (!$occupants): ?>
                   <?php
-                    if ($total === 0 && !$hasFilters) {
+                    if ($stats['total'] === 0 && !$hasFilters) {
                         $emptyIcon  = 'users';
                         $emptyTitle = 'No occupants registered yet';
                         $emptyText  = 'The dormitory log book is empty. Register the first occupant to get started.';
@@ -305,11 +343,13 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
                         <div class="row-actions">
                           <a class="icon-btn"
                              href="edit-occupant.php?id=<?= urlencode($o['occupant_id']) ?>"
+                             data-tooltip="Edit details"
                              aria-label="Edit <?= e($o['full_name']) ?>">
                             <span data-icon="edit"></span>
                           </a>
                           <?php if ($isActive): ?>
                             <button type="button" class="icon-btn icon-btn--danger"
+                                    data-tooltip="Deactivate — frees their room, keeps log history"
                                     aria-label="Deactivate <?= e($o['full_name']) ?>"
                                     data-action="open-deactivate"
                                     data-id="<?= e($o['occupant_id']) ?>"
@@ -321,6 +361,7 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
                             </button>
                           <?php else: ?>
                             <button type="button" class="icon-btn icon-btn--restore"
+                                    data-tooltip="Reactivate — assign a new room"
                                     aria-label="Reactivate <?= e($o['full_name']) ?>"
                                     data-action="open-reactivate"
                                     data-id="<?= e($o['occupant_id']) ?>"
@@ -425,7 +466,8 @@ $view = ($_GET['view'] ?? 'table') === 'cards' ? 'cards' : 'table';
   <!-- toast -->
   <div class="toast" id="toast" hidden></div>
 
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/tooltips.js"></script>
   <script src="../assets/js/occupants.js"></script>
 </body>
 </html>

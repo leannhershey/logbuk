@@ -1,4 +1,8 @@
 <?php
+/**
+ * POST {passcode} -> verifies against the Admins table (bcrypt), falling back
+ * to ADMIN_PASSCODE_HASH in config/config.php when the table is empty.
+ */
 require_once __DIR__ . '/../includes/auth.php';
 
 require_post();
