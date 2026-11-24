@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LogBUk – Bicol University Dormitory Log Book</title>
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/occupant-logbook.css">
+</head>
+<body>
+  <div class="public-page">
+    <header class="topbar">
+      <a class="brand">
+        <img src="assets/images/logo_header.png" alt="LogBUk logo header">
+      </a>
+      <span class="role-pill hidden" id="pill-occupant"><span data-icon="user"></span>Occupant</span>
+      <span class="role-pill hidden" id="pill-admin"><span data-icon="admin"></span>Admin</span>
+    </header>
+
+    <main class="public-main">
+      <!-- role selection -->
+      <div class="view" id="view-role">
+        <section class="card role-card">
+        <img class="role-card__logo" src="assets/images/logo.png" alt="LogBUk logo">
+        <p class="role-card__subtitle">Bicol University Dormitory Digitalized Log Book System</p>
+
+        <div class="role-options">
+          <article class="role-option role-option--admin">
+            <span data-icon="admin"></span>
+            <h2>Admin</h2>
+            <p>For Dormitory Management<br>Manage occupant registration, room assignments, records, and reports.</p>
+            <a class="role-option__btn" href="#admin">Continue as Admin</a>
+          </article>
+
+          <article class="role-option role-option--occupant">
+            <span data-icon="user"></span>
+            <h2>Occupant</h2>
+            <p>For Registered Occupants<br>Record your dormitory time-in and time-out.</p>
+            <a class="role-option__btn" href="#occupant">Continue as Occupant</a>
+          </article>
+        </div>
+      </section>
+      </div>
+
+      <!-- occupant e-logbook: ID entry -> occupant info (Time-In / Time-Out) -> confirmation -->
+      <div class="view" id="view-occupant">
+        <!-- step 1: occupant ID entry -->
+        <section class="card auth-card" id="occ-step-id">
+          <div class="auth-card__icon_occupant"><span data-icon="clipboard"></span></div>
+          <h1>Occupant E-Logbook</h1>
+          <p class="auth-card__hint">Enter your registered occupant ID to proceed.</p>
+          <form id="idForm" novalidate>
+            <div class="field" id="idField">
+              <label for="occupantId">Occupant ID</label>
+              <input type="text" id="occupantId" placeholder="e.g. 01-0001" inputmode="numeric" maxlength="7" autocomplete="off">
+              <p class="field__error" role="alert"><span data-icon="warning"></span><span></span></p>
+            </div>
+            <button type="submit" class="btn btn--primary" id="btnVerify">Verify ID</button>
+          </form>
+          <a class="link-home" href="#role"><span data-icon="homeSolid"></span>Return to Home</a>
+        </section>
+
+        <!-- step 2: occupant information + Time-In / Time-Out -->
+        <section class="card occ-card" id="occ-step-info" hidden>
+          <h1 class="occ-card__title">Occupant Information</h1>
+          <div class="occ-profile">
+            <div class="occ-avatar" aria-hidden="true">
+              <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#d9d9d9"/><path d="M18 92c0-18 14-27 32-27s32 9 32 27z" fill="#6aa0e8" stroke="#2f5fa8" stroke-width="2"/><circle cx="50" cy="42" r="17" fill="#f6c76b" stroke="#c9953a" stroke-width="2"/><path d="M33 40c-2-16 8-23 18-23s20 6 16 23c-3-8-8-11-17-11s-14 3-17 11z" fill="#8a5a2b"/></svg>
+            </div>
+            <div class="occ-profile__body">
+              <div class="occ-profile__head">
+                <h2 id="occName"></h2>
+                <span class="occ-status" id="occStatus"></span>
+              </div>
+              <dl class="occ-dl">
+                <dt>Occupant ID</dt><dd id="occId"></dd>
+                <dt>Program</dt><dd id="occProgram"></dd>
+                <dt>Assigned Room</dt><dd id="occRoom"></dd>
+                <dt>Contact Number</dt><dd id="occContact"></dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="field occ-whereabouts" id="whereaboutsField" hidden>
+            <label for="whereabouts">Whereabouts <span class="occ-req">*</span></label>
+            <p class="occ-hint">Please enter your destination before time-out.</p>
+            <input type="text" id="whereabouts" maxlength="100" placeholder="e.g. Library, Classroom, Outside Campus" autocomplete="off">
+            <p class="field__error" role="alert"><span data-icon="warning"></span><span></span></p>
+          </div>
+
+          <div class="field occ-actionerror" id="actionField">
+            <p class="field__error" role="alert"><span data-icon="warning"></span><span></span></p>
+          </div>
+
+          <button type="button" class="occ-btn occ-btn--in" id="btnTimeIn" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-5"/><path d="M10 8l4 4-4 4"/><path d="M14 12H3"/></svg>
+            TIME-IN
+          </button>
+          <button type="button" class="occ-btn occ-btn--out" id="btnTimeOut" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5"/><path d="M16 8l4 4-4 4"/><path d="M20 12H9"/></svg>
+            TIME-OUT
+          </button>
+
+          <a class="occ-back" href="#occupant" data-occ-back>&larr; Back to E-logbook</a>
+        </section>
+
+        <!-- step 3: transaction confirmation -->
+        <section class="card occ-card occ-card--done" id="occ-step-done" hidden>
+          <div class="occ-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </div>
+          <h1 class="occ-card__title" id="doneTitle"></h1>
+          <p class="occ-done__sub">Your transaction has been recorded successfully.</p>
+          <dl class="occ-receipt" id="doneReceipt"></dl>
+          <div class="occ-late" id="doneLate" hidden>
+            <span data-icon="clock"></span>
+            <span id="doneLateText"></span>
+          </div>
+          <button type="button" class="occ-btn occ-btn--home" data-occ-back>
+            <span data-icon="homeSolid"></span>Back to E-logbook
+          </button>
+        </section>
+      </div>
+
+      <!-- admin verification -->
+      <div class="view" id="view-admin">
+        <section class="card auth-card">
+        <div class="auth-card__icon_admin"><span data-icon="key"></span></div>
+        <h1>Admin Verification</h1>
+        <p class="auth-card__hint">Enter the administrator passcode to continue.</p>
+
+        <form id="verifyForm" novalidate>
+          <div class="field" id="passcodeField">
+            <label class="sr-only" for="passcode">Administrator passcode</label>
+            <input type="password" id="passcode" placeholder="Enter passcode" autocomplete="current-password">
+            <p class="field__error" role="alert"><span data-icon="warning"></span><span></span></p>
+          </div>
+          <button type="submit" class="btn btn--primary">Verify Passcode</button>
+        </form>
+
+        <a class="link-home" href="#role"><span data-icon="homeSolid"></span>Return to Home</a>
+      </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/index.js"></script>
+  <script src="assets/js/occupant-logbook.js"></script>
+</body>
+</html>
