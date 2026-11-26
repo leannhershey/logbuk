@@ -119,8 +119,8 @@ on Settings. Two triggers keep `last_seen_at` current, and `sp_auto_deactivate_i
 
 ## 8. Developers
 
-Alcazar, Elisha Faith R.
-Asiado, Katreena Allysa C.
-Barrameda, Jhon Rey B.
-Secillano, Leann Hershey A.
-Vichozo, Mary Chlowee Nicolette F.
+Elisha Faith R. Alcazar,  
+Katreena Allysa C. Asiado,  
+Jhon Rey B. Barrameda,  
+Leann Hershey A. Secillano,  
+Mary Chlowee Nicolette F. Vichozo
