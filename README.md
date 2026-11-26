@@ -116,3 +116,11 @@ on Settings. Two triggers keep `last_seen_at` current, and `sp_auto_deactivate_i
 | "Nothing is answering on the MySQL port" | start **MySQL** in the XAMPP Control Panel |
 | No styling or icons | the URL is wrong: it must start with `http://localhost/logbuk/` |
 | Sent back to the passcode screen | normal when there is no admin session yet |
+
+## 8. Developers
+
+Alcazar, Elisha Faith R.
+Asiado, Katreena Allysa C.
+Barrameda, Jhon Rey B.
+Secillano, Leann Hershey A.
+Vichozo, Mary Chlowee Nicolette F.
