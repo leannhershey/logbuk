@@ -281,6 +281,7 @@
 }
 .occupants-table thead th:first-child { padding-left: 18px; }
 .occupants-table thead th:last-child { text-align: right; padding-right: 18px; }
+.settings-page .occupants-table thead th:last-child { text-align: left; }
 
 .occupants-table tbody td {
   font-size: 0.72rem;
@@ -1858,3 +1859,4 @@ button.pager__btn { border: 0; cursor: pointer; font-family: inherit; }
 }
 
 .settings-page label .req { color: #dc2626; font-weight: 700; }
+
