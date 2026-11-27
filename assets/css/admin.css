@@ -289,9 +289,10 @@
   border-bottom: 1px solid #eef0f4;
 }
 .occupants-table tbody td:first-child { padding-left: 18px; }
-.occupants-table tbody td:last-child { padding-right: 18px; }
+.occupants-table tbody td:last-child { padding-right: 18px; text-align: left; }
 .occupants-table tbody tr:last-child td { border-bottom: 0; }
 .occupants-table tbody tr:hover { background: #f8fafd; }
+
 
 .occupants-table .cell-id { white-space: nowrap; color: #4b5563; }
 .occupants-table .cell-name { font-weight: 600; }
@@ -301,6 +302,8 @@
 .occupants-table .cell-registered { white-space: nowrap; line-height: 1.3; }
 .occupants-table .cell-registered strong { display: block; font-weight: 600; font-size: 0.7rem; }
 .occupants-table .cell-registered small { font-size: 0.66rem; color: var(--color-muted); }
+
+
 
 .badge {
   display: inline-block;
@@ -418,6 +421,18 @@
 .th-sort__arrow { font-size: 0.55rem; opacity: 0.65; }
 .th-sort.is-sorted { color: var(--color-navy); }
 .th-sort.is-sorted .th-sort__arrow { opacity: 1; }
+
+.rp-table thead th:last-child,
+.logs-table thead th:last-child {
+  text-align: left;
+  padding-right: 10px;
+}
+
+.rp-table tbody td:last-child,
+.logs-table tbody td:last-child {
+  text-align: left;
+  padding-right: 10px;
+}
 
 .list-card.is-loading { opacity: 0.55; pointer-events: none; transition: opacity 0.12s; }
 
