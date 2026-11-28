@@ -225,3 +225,16 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+/* directory of active occupants with room load */
+CREATE OR REPLACE VIEW vw_occupants_directory AS
+SELECT o.occupant_id, o.first_name, o.middle_name, o.last_name, o.suffix,
+       o.program, o.contact_number, o.presence_status, o.residency_status,
+       o.room_id, r.capacity, COUNT(o2.occupant_id) AS room_occupancy
+FROM Occupants o
+LEFT JOIN Rooms r ON o.room_id = r.room_id
+LEFT JOIN Occupants o2 ON o.room_id = o2.room_id AND o2.residency_status = 'Active'
+WHERE o.residency_status = 'Active'
+GROUP BY o.occupant_id, o.first_name, o.middle_name, o.last_name, o.suffix,
+         o.program, o.contact_number, o.presence_status, o.residency_status,
+         o.room_id, r.capacity;
